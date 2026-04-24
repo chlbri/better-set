@@ -36,3 +36,7 @@ version bump in `package.json`.
 ## Workflow
 
 Start at → [`steps/step1.md`](steps/step1.md)
+
+## NB
+
+ALWAYS IN ENGLISH, NO OTHER LANGUAGE, EVEN IN THE CHANGELOG.

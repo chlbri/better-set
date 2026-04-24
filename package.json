@@ -1,21 +1,20 @@
 {
-  "name": "@bemedev///TODO",
-  "version": "0.0.1",
-  "description": "//TODO",
+  "name": "@bemedev/better-set",
+  "version": "0.1.0",
+  "description": "A better Set implementation with customizable equality check",
+  "keywords": [
+    "array",
+    "check",
+    "compare",
+    "elements",
+    "set"
+  ],
+  "license": "MIT",
   "author": {
-    "email": "bri_lvi@icloud.com",
     "name": "chlbri",
+    "email": "bri_lvi@icloud.com",
     "url": "https://bemedev.vercel.app"
   },
-  "repository": {
-    "type": "git",
-    "url": "//TODO"
-  },
-  "license": "MIT",
-  "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "module": "lib/index.js",
   "maintainers": [
     {
       "email": "bri_lvi@icloud.com",
@@ -30,16 +29,22 @@
       "url": "https://bemedev.vercel.app"
     }
   ],
-  "keywords": [
-    "//TODO"
-  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chlbri/better-set"
+  },
   "files": [
     "lib",
-    "public"
+    "public",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
-  "engines": {
-    "node": ">=24"
-  },
+  "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "_preconfig": "chmod +x .husky/commit-msg",
     "build": "pnpm run rm:lib && pnpm run rolldown",
@@ -53,10 +58,10 @@
     "lint:watch": "onchange --await-write-finish 1500 -d 10000 -v \"**/*.ts\" -- pnpm run lint",
     "build:watch": "onchange --await-write-finish 1500 -d 10000 -v \"**/*.ts\" -- pnpm run build",
     "p-q": "pretty-quick",
-    "posttest": "pnpm run fmt",
+    "posttest": "pnpm build-tests post && pnpm run fmt",
     "prepare": "husky",
     "prepublishOnly": "",
-    "pretest": "pnpm run build && pnpm run size",
+    "pretest": "pnpm run build && pnpm build-tests pre && pnpm run size",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "rinit": "pnpm run rm && pnpm run config",
@@ -73,16 +78,6 @@
     "size": "size-limit",
     "upgrade:fast": "pnpm up --latest"
   },
-  "size-limit": [
-    {
-      "path": "lib/*.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "lib/*.cjs",
-      "limit": "10 KB"
-    }
-  ],
   "devDependencies": {
     "@bemedev/dev-utils": "^0.6.5",
     "@size-limit/file": "^12.1.0",
@@ -103,5 +98,18 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
+  },
+  "size-limit": [
+    {
+      "path": "lib/*.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "lib/*.cjs",
+      "limit": "10 KB"
+    }
+  ],
+  "engines": {
+    "node": ">=24"
   }
 }

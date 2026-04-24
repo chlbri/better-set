@@ -3,10 +3,17 @@ import { exclude } from '@bemedev/dev-utils/vitest-exclude';
 import { defineConfig } from 'vitest/config';
 import tsconfig from './tsconfig.json';
 
+const IS_VSCODE_EXTENSION = process.env.VITEST_VSCODE === 'true';
+
 export default defineConfig({
   plugins: [
     aliasTs(tsconfig as any),
-    exclude({ ignoreCoverageFiles: ['**/index.ts'] }),
+    exclude({
+      ignoreCoverageFiles: ['**/index.ts', '**/*.built.test.ts'],
+      ignoreTestFiles: IS_VSCODE_EXTENSION
+        ? ['**/*.built.test.ts']
+        : undefined,
+    }),
   ],
   test: {
     bail: 10,
@@ -15,11 +22,13 @@ export default defineConfig({
     slowTestThreshold: 3000,
     globals: true,
     logHeapUsage: true,
+    typecheck: {
+      enabled: true,
+      ignoreSourceErrors: false,
+    },
     coverage: {
       enabled: true,
-      extension: 'ts',
       reportsDirectory: '.coverage',
-      all: true,
       provider: 'v8',
     },
   },

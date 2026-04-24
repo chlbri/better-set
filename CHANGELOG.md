@@ -1,15 +1,37 @@
 ## CHANGELOG
 
 <br/>
+
+All notable changes to this project will be documented in this file.
+
+The format is based on
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+<br/>
 <br/>
 
-### Version [0.0.1] --> _date & hour_
+<details>
+<summary>
 
-- ✨ Première version de la bibliothèque
+### Version [0.1.0] --> 24/04/2026 18:23
+
+</summary>
+
+- ✨ Initioal release de `@bemedev/better-set`
+- Add `createBetterSet` / `createSet` with optional custom equality
+  comparison
+- Add set operations: `union`, `intersection`, `difference`,
+  `symmetricDifference`
+- Add relationship checks: `isSubsetOf`, `isSupersetOf`, `isDisjointFrom`
+- Add iterable support, `toArray`, `entries`, `keys`, `values`, `forEach`,
+  `clear`, `delete`, `size`, and `isEmpty`
+
+</details>
 
 <br/>
 
-## Auteur
+## Author
 
 chlbri (bri_lvi@icloud.com)
 
@@ -21,4 +43,4 @@ chlbri (bri_lvi@icloud.com)
 
 ## Liens
 
-- [Documentation](https://github.com/chlbri/new-package)
+- [Repository](https://github.com/chlbri/better-set)
