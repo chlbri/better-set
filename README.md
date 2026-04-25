@@ -52,6 +52,7 @@ console.log(set.toArray); // [ { id: 1 }, { id: 2 } ]
 - `entries`
 - `keys`
 - `values`
+- `replaceItems(source)` for swapping in a `Set` or another `BetterSet`
 - `union(other, equals)`
 - `intersection(other, equals)`
 - `difference(other, equals)`

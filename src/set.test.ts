@@ -42,7 +42,7 @@ describe('BetterSet', () => {
     source.add(1, 2);
 
     const target = createBetterSet<number>();
-    target.__provideItems(source);
+    target.replaceItems(source);
 
     expect([...target]).toEqual([1, 2]);
     expect(target.toArray).toEqual([1, 2]);
@@ -104,7 +104,110 @@ describe('BetterSet', () => {
     expect(symmetric.toArray).toEqual([1, 2, 4, 5]);
   });
 
-  test('#07 => evaluates subset, superset, and disjoint relationships', () => {
+  test('#07 => uses default comparator behavior for primitive set operations', () => {
+    const a = createBetterSet<number>();
+    const b = createBetterSet<number>();
+
+    a.add(1, 2, 3);
+    b.add(2, 3, 4);
+
+    const intersection = a.intersection(b);
+    const difference = a.difference(b);
+
+    expect(intersection.toArray).toEqual([2, 3]);
+    expect(difference.toArray).toEqual([1]);
+  });
+
+  test('#08 => supports deep object equality for set operations and relationships', () => {
+    type Complex = {
+      id: number;
+      nested: {
+        level2: {
+          level3: { tag: string; active: boolean };
+        };
+      };
+    };
+
+    const deepEquals = (a: Complex, b: Complex) => {
+      return (
+        a.id === b.id &&
+        a.nested.level2.level3.tag === b.nested.level2.level3.tag &&
+        a.nested.level2.level3.active === b.nested.level2.level3.active
+      );
+    };
+
+    /** Inferred type of eaquals by the type paraameter */
+    const setA = createBetterSet<Complex>((a, b) => {
+      return (
+        a.id === b.id &&
+        a.nested.level2.level3.tag === b.nested.level2.level3.tag &&
+        a.nested.level2.level3.active === b.nested.level2.level3.active
+      );
+    });
+
+    const setB = createBetterSet<Complex>(deepEquals);
+
+    const item1: Complex = {
+      id: 1,
+      nested: { level2: { level3: { tag: 'one', active: true } } },
+    };
+    const item2: Complex = {
+      id: 2,
+      nested: { level2: { level3: { tag: 'two', active: false } } },
+    };
+    const item2Duplicate: Complex = {
+      id: 2,
+      nested: { level2: { level3: { tag: 'two', active: false } } },
+    };
+    const item3: Complex = {
+      id: 3,
+      nested: { level2: { level3: { tag: 'three', active: true } } },
+    };
+    const item4: Complex = {
+      id: 4,
+      nested: { level2: { level3: { tag: 'four', active: false } } },
+    };
+
+    setA.add(item1, item2);
+    setB.add(item2Duplicate, item3);
+
+    const union = setA.union(setB, deepEquals);
+    const intersection = setA.intersection(setB, deepEquals);
+    const difference = setA.difference(setB, deepEquals);
+    const symmetric = setA.symmetricDifference(setB, deepEquals);
+
+    expect(union.toArray.map(item => item.id)).toEqual([1, 2, 3]);
+    expect(intersection.toArray.map(item => item.id)).toEqual([2]);
+    expect(difference.toArray.map(item => item.id)).toEqual([1]);
+    expect(symmetric.toArray.map(item => item.id)).toEqual([1, 3]);
+
+    const subset = createBetterSet<Complex>(deepEquals);
+    subset.add(item2Duplicate);
+
+    const disjoint = createBetterSet<Complex>(deepEquals);
+    disjoint.add(item4);
+
+    expect(subset.isSubsetOf(setA)).toBe(true);
+    expect(setA.isSupersetOf(subset)).toBe(true);
+    expect(setA.isDisjointFrom(disjoint)).toBe(true);
+    expect(subset.isDisjointFrom(disjoint)).toBe(true);
+    expect(setA.isSubsetOf(subset)).toBe(false);
+
+    expect(setA.isSupersetOf(setB)).toBe(false);
+    expect(setA.isDisjointFrom(setB)).toBe(false);
+  });
+
+  test('#09 => replaceItems can swap in a native Set value object', () => {
+    const source = new Set([1, 2, 3]);
+    const target = createBetterSet<number>();
+
+    target.replaceItems(source);
+
+    expect([...target]).toEqual([1, 2, 3]);
+    expect(target.toArray).toEqual([1, 2, 3]);
+  });
+
+  test('#10 => evaluates subset, superset, and disjoint relationships', () => {
     const parent = createBetterSet<number>();
     const subset = createBetterSet<number>();
     const disjoint = createBetterSet<number>();

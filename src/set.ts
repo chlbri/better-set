@@ -19,6 +19,10 @@ class BetterSet<T = any> implements Iterable<T> {
     }
   };
 
+  get replaceItems() {
+    return this.__provideItems;
+  }
+
   #add = (item: T) => {
     const equals = this.equals;
 
@@ -90,57 +94,109 @@ class BetterSet<T = any> implements Iterable<T> {
     return Array.from(this.#items);
   }
 
+  #getEquals = (other?: BetterSet<T>, equals?: Fn<[T, T], boolean>) => {
+    return equals ?? this.equals ?? other?.equals;
+  };
+
+  #hasItem = (items: Set<T>, item: T, equals?: Fn<[T, T], boolean>) => {
+    if (!equals) return items.has(item);
+
+    for (const entry of items) {
+      if (equals(entry, item)) return true;
+    }
+
+    return false;
+  };
+
   // #region With others
-  union = <U>(
-    other: BetterSet<U>,
-    equals: Fn<[U | T, U | T], boolean>,
-  ) => {
-    const rest = new BetterSet<U | T>(equals);
-    const items = this.#items.union(other.#items);
-    rest.__provideItems(items);
+  union = (other: BetterSet<T>, equals?: Fn<[T, T], boolean>) => {
+    const comparator = this.#getEquals(other, equals);
+    const rest = new BetterSet(comparator);
+    rest.add(...this.#items);
+    rest.add(...other.#items);
     return rest;
   };
 
-  intersection = <U>(
-    other: BetterSet<U>,
-    equals: Fn<[U | T, U | T], boolean>,
-  ) => {
-    const rest = new BetterSet<U | T>(equals);
-    const items = this.#items.intersection(other.#items);
-    rest.__provideItems(items);
+  intersection = (other: BetterSet<T>, equals?: Fn<[T, T], boolean>) => {
+    const comparator = this.#getEquals(other, equals);
+    const rest = new BetterSet(comparator);
+
+    this.#items.forEach(item => {
+      const check = this.#hasItem(other.#items, item, comparator);
+      if (check) rest.add(item);
+    });
+
     return rest;
   };
 
-  difference = <U>(
-    other: BetterSet<U>,
-    equals: Fn<[U | T, U | T], boolean>,
-  ) => {
-    const rest = new BetterSet<U | T>(equals);
-    const items = this.#items.difference(other.#items);
-    rest.__provideItems(items);
+  difference = (other: BetterSet<T>, equals?: Fn<[T, T], boolean>) => {
+    const comparator = this.#getEquals(other, equals);
+    const rest = new BetterSet(comparator);
+
+    this.#items.forEach(item => {
+      const check = !this.#hasItem(other.#items, item, comparator);
+      if (check) rest.add(item);
+    });
+
     return rest;
   };
 
-  symmetricDifference = <U>(
-    other: BetterSet<U>,
-    equals: Fn<[U | T, U | T], boolean>,
+  symmetricDifference = (
+    other: BetterSet<T>,
+    equals?: Fn<[T, T], boolean>,
   ) => {
-    const rest = new BetterSet<U | T>(equals);
-    const items = this.#items.symmetricDifference(other.#items);
-    rest.__provideItems(items);
+    const comparator = this.#getEquals(other, equals);
+    const rest = new BetterSet(comparator);
+
+    this.#items.forEach(item => {
+      const check = !this.#hasItem(other.#items, item, comparator);
+      if (check) rest.add(item);
+    });
+
+    other.#items.forEach(item => {
+      const check = !this.#hasItem(this.#items, item, comparator);
+      if (check) rest.add(item);
+    });
+
     return rest;
   };
 
-  isSubsetOf = (other: BetterSet) => {
-    return this.#items.isSubsetOf(other.#items);
+  isSubsetOf = (other: BetterSet<T>) => {
+    const comparator = this.#getEquals(other);
+    if (!comparator) return this.#items.isSubsetOf(other.#items);
+
+    for (const item of this.#items) {
+      const check = !this.#hasItem(other.#items, item, comparator);
+      if (check) return false;
+    }
+
+    return true;
   };
 
-  isSupersetOf = (other: BetterSet) => {
-    return this.#items.isSupersetOf(other.#items);
+  isSupersetOf = (other: BetterSet<T>) => {
+    const comparator = this.#getEquals(other as BetterSet<T>);
+
+    if (!comparator) return this.#items.isSupersetOf(other.#items);
+
+    for (const item of other.#items) {
+      const check = !this.#hasItem(this.#items, item, comparator);
+      if (check) return false;
+    }
+
+    return true;
   };
 
-  isDisjointFrom = (other: BetterSet) => {
-    return this.#items.isDisjointFrom(other.#items);
+  isDisjointFrom = (other: BetterSet<T>) => {
+    const comparator = this.#getEquals(other);
+
+    if (!comparator) return this.#items.isDisjointFrom(other.#items);
+
+    for (const item of this.#items) {
+      const check = this.#hasItem(other.#items, item, comparator);
+      if (check) return false;
+    }
+
+    return true;
   };
 
   // #endregion
@@ -148,8 +204,10 @@ class BetterSet<T = any> implements Iterable<T> {
   [Symbol.toStringTag] = 'BetterSet';
 }
 
-export const createBetterSet = <T = any>(equals?: Fn<[T, T], boolean>) =>
-  new BetterSet<T>(equals);
+export const createBetterSet = <T = any>(equals?: Fn<[T, T], boolean>) => {
+  return new BetterSet<T>(equals);
+};
+
 export const createSet = createBetterSet;
 
 export { type BetterSet };

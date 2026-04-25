@@ -6,7 +6,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
-adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0/).
+
+<br/>
+<br/>
+
+<details>
+<summary>
+
+### Version [0.2.0] --> 25/04/2026 14:00
+
+</summary>
+
+- ✨ Add `replaceItems` alias for native `Set` interop and item replacement
+- ✨ Improve union, intersection, difference, and symmetricDifference to
+  support optional custom comparators
+- ✨ Extend `isSubsetOf`, `isSupersetOf`, and `isDisjointFrom` to support
+  deep equality comparators
+- ✅ Fix generic set operation behavior and preserve comparator fallback
+  semantics
+
+</details>
 
 <br/>
 <br/>
